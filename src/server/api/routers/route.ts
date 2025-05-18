@@ -91,23 +91,46 @@ export const routeRouter = createTRPCRouter({
         },
       });
     }),
-  getAllUpcoming: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.route.findMany({
-      where: {
-        dateTime: {
-          gte: new Date(),
+  getAllUpcoming: protectedProcedure
+    .input(
+      z
+        .object({
+          date: z.date().optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ ctx, input }) => {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      const startDate = input?.date ?? now;
+      startDate.setHours(0, 0, 0, 0);
+
+      const endDate = new Date(startDate);
+      endDate.setHours(23, 59, 59, 999);
+
+      return ctx.db.route.findMany({
+        where: {
+          dateTime: input?.date
+            ? {
+                gte: startDate,
+                lte: endDate,
+              }
+            : {
+                gte: now,
+              },
+          status: "ACTIVE",
         },
-      },
-      include: {
-        _count: {
-          select: {
-            userRides: { where: { status: "ACTIVE" } },
+        include: {
+          _count: {
+            select: {
+              userRides: { where: { status: "ACTIVE" } },
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+        orderBy: { dateTime: "asc" },
+      });
+    }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.route.findMany({

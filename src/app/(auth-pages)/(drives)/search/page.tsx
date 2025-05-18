@@ -151,7 +151,7 @@ export default function SearchResultsPage() {
               ))}
             </ul>
           ) : (
-            <p>No routes found matching your criteria.</p>
+            <p>За съжаление, не намерихме маршрути.</p>
           )}
         </div>
       )}

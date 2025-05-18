@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 import {
@@ -11,6 +11,11 @@ import {
 } from "@react-google-maps/api";
 import { env } from "~/env";
 import type { Libraries } from "@react-google-maps/api";
+import {
+  RouteFilters,
+  type FilterType,
+  getFilterDate,
+} from "~/components/RouteFilters";
 
 const libraries: Libraries = ["places", "geometry"];
 
@@ -47,16 +52,23 @@ export default function AllRoutesMapPage() {
     libraries,
   });
 
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>("today");
+  const [selectedRouteId, setSelectedRouteId] = useState<
+    string | number | null
+  >(null);
+
+  const filterDate = useMemo(
+    () => getFilterDate(selectedFilter),
+    [selectedFilter],
+  );
+
   const {
     data: routes,
     isLoading,
     isError,
-  } = api.routes.getAllUpcoming.useQuery();
-
-  // Track which route is currently selected / highlighted
-  const [selectedRouteId, setSelectedRouteId] = useState<
-    string | number | null
-  >(null);
+  } = api.routes.getAllUpcoming.useQuery({
+    date: filterDate,
+  });
 
   if (isLoading || !isLoaded) {
     return <div className="flex justify-center p-12">Loading...</div>;
@@ -66,25 +78,23 @@ export default function AllRoutesMapPage() {
     return <div className="p-12 text-red-500">Error loading routes</div>;
   }
 
-  if (!routes || routes.length === 0) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        Няма намерени предстоящи маршрути
-      </div>
-    );
-  }
-
   // Filter routes that have directions
-  const routesWithDirections = routes.filter((route) => route.directions);
+  const routesWithDirections = routes?.filter((route) => route.directions);
 
   // Find the currently selected route object
-  const selectedRoute = routes.find((route) => route.id === selectedRouteId);
+  const selectedRoute = routes?.find((route) => route.id === selectedRouteId);
 
   return (
     <div className="flex h-screen w-full flex-col pt-12">
-      <h1 className="mb-4 px-4 text-2xl font-bold">
-        Всички предстоящи маршрути
-      </h1>
+      <div className="px-4">
+        <h1 className="mb-4 text-2xl font-bold">Всички предстоящи маршрути</h1>
+        <div className="mb-4">
+          <RouteFilters
+            selectedFilter={selectedFilter}
+            onFilterChange={setSelectedFilter}
+          />
+        </div>
+      </div>
 
       {/* Info box for the selected route */}
       {selectedRoute ? (
@@ -153,7 +163,7 @@ export default function AllRoutesMapPage() {
             mapTypeControl: false,
           }}
         >
-          {routesWithDirections.map((route, index) => {
+          {routesWithDirections?.map((route, index) => {
             // Get color for this route (cycle through colors)
             const routeColor = ROUTE_COLORS[index % ROUTE_COLORS.length];
 

@@ -19,7 +19,7 @@ interface SearchState {
 export const useSearchStore = create<SearchState>((set) => ({
   searchOrigin: null,
   searchDestination: null,
-  searchDate: null,
+  searchDate: new Date().toISOString(),
   searchTime: null,
   setSearchOrigin: (origin) => set({ searchOrigin: origin }),
   setSearchDestination: (destination) =>

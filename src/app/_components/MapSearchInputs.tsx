@@ -156,6 +156,7 @@ export function MapSearchInputs({
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
+                  weekStartsOn={1}
                   mode="single"
                   selected={dateObject}
                   onSelect={handleDateSelect}
