@@ -47,6 +47,7 @@ export default function AllRoutesPage() {
                         minute: "2-digit",
                       })}
                     </p>
+                    <p className="text-blue-500 hover:underline">Виж маршрут</p>
                   </li>
                 </Link>
               ))}
