@@ -40,7 +40,7 @@ export const routeRouter = createTRPCRouter({
         origin: z.string(),
         destination: z.string(),
         directions: z.any(), // Reverted to z.any() for input to Prisma
-        dateTime: z.date().optional(),
+        dateTime: z.date(),
         seats: z.number().int().optional(),
       }),
     )
