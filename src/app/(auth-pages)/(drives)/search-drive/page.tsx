@@ -11,7 +11,7 @@ import { useSearchStore } from "~/store/searchStore";
 import { Button } from "~/components/ui/button";
 import { BaseDialog } from "~/app/_components/BaseDialog";
 
-const libraries: Libraries = ["places"];
+const libraries: Libraries = ["places", "geometry"];
 
 export default function SearchDrivePage() {
   const mapRef = useRef<google.maps.Map | null>(null);

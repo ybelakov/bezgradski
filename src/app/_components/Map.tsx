@@ -12,7 +12,7 @@ import { api } from "~/trpc/react";
 import { ConfirmRouteDialog } from "./ConfirmRouteDialog";
 import { useRouter } from "next/navigation";
 
-const libraries: Libraries = ["places"];
+const libraries: Libraries = ["places", "geometry"];
 
 export function Map() {
   const mapRef = useRef<google.maps.Map | null>(null);

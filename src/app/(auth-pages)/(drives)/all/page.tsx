@@ -14,7 +14,11 @@ export default function AllRoutesPage() {
   return (
     <div className="container mx-auto p-4 pt-12">
       <h1 className="mb-6 text-2xl font-bold">
-        Всички предстоящи маршрути в София
+        Всички предстоящи маршрути в София (
+        <Link className="text-md text-blue-400" href="/all-map">
+          виж на картата
+        </Link>
+        )
       </h1>
 
       {isLoading && <p>Зареждане на маршрути...</p>}

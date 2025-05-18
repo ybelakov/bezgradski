@@ -8,8 +8,7 @@ import {
 import { env } from "~/env";
 import type { Libraries } from "@react-google-maps/api";
 
-const libraries: Libraries = ["places"];
-
+const libraries: Libraries = ["places", "geometry"];
 interface RouteDisplayMapProps {
   directions?: google.maps.DirectionsResult;
 }
