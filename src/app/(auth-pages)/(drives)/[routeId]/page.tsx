@@ -105,7 +105,17 @@ export default function RouteDetailsPage() {
     },
   });
 
-  if (isLoadingRoute || (session && isLoadingUserRideStatus)) return null;
+  const cancelRideMutation = api.userRide.cancelRide.useMutation({
+    onSuccess: async () => {
+      // Invalidate queries to refetch data and update UI
+      await utils.routes.getById.invalidate({ id: routeId });
+      await utils.userRide.getRideStatusForRoute.invalidate({ routeId });
+    },
+  });
+
+  if (isLoadingRoute || (session && isLoadingUserRideStatus)) {
+    return <div className="flex justify-center p-12">Loading...</div>;
+  }
 
   if (isRouteError) return <p>Error fetching route: {routeError?.message}</p>;
   if (!route) return <p>Route not found.</p>;
@@ -205,6 +215,25 @@ export default function RouteDetailsPage() {
           disabled={signUpMutation.isPending}
         >
           Запиши се за пътуването
+        </button>
+      )}
+
+      {/* Cancel Registration Button */}
+      {isActiveUserRide && !isRouteInPast && (
+        <button
+          onClick={() => {
+            if (
+              confirm(
+                "Сигурни ли сте, че искате да откажете записването си за този маршрут?",
+              )
+            ) {
+              cancelRideMutation.mutate({ routeId });
+            }
+          }}
+          className="mb-6 ml-2 rounded bg-red-500 px-6 py-2 text-white hover:bg-red-600 disabled:opacity-50"
+          disabled={cancelRideMutation.isPending}
+        >
+          {cancelRideMutation.isPending ? "Отказване..." : "Откажи записването"}
         </button>
       )}
 

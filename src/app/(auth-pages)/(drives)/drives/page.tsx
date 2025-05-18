@@ -53,11 +53,7 @@ export default function DrivesPage() {
     (!myRoutes || myRoutes.length === 0) &&
     (!passengerRides || passengerRides.length === 0)
   ) {
-    return (
-      <div className="container mx-auto p-4 text-center">
-        Нямате пътувания или записвания за пътуване.
-      </div>
-    );
+    return null;
   }
 
   // Get current date and time
@@ -119,10 +115,6 @@ export default function DrivesPage() {
         {/* Routes where I'm the driver */}
         {(myUpcomingRoutes.length > 0 || myPastRoutes.length > 0) && (
           <div className="space-y-4">
-            <h1 className="mb-6 text-2xl font-bold">
-              Моите пътувания като шофьор
-            </h1>
-
             {myUpcomingRoutes.length > 0 && (
               <>
                 <h2 className="mb-4 text-left text-xl font-semibold">
@@ -154,7 +146,8 @@ export default function DrivesPage() {
                       Общо места: {route.seats ?? "N/A"}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Свободни места: {route._count.userRides ?? "N/A"}
+                      Свободни места:{" "}
+                      {(route.seats ?? 0) - (route._count.userRides ?? 0)}
                     </p>
                     <Link
                       href={`/${route.id}`}
@@ -247,7 +240,8 @@ export default function DrivesPage() {
                       Общо места: {route.seats ?? "N/A"}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Свободни места: {route._count.userRides ?? "N/A"}
+                      Свободни места:{" "}
+                      {(route.seats ?? 0) - (route._count.userRides ?? 0)}
                     </p>
                     <Link
                       href={`/${route.id}`}
@@ -315,12 +309,10 @@ export default function DrivesPage() {
         {(upcomingPassengerRides.length > 0 ||
           pastPassengerRides.length > 0) && (
           <div className="mt-8 space-y-4">
-            <h1 className="mb-6 text-2xl font-bold">Моите пътувания</h1>
-
             {upcomingPassengerRides.length > 0 && (
               <>
                 <h2 className="mb-4 text-left text-xl font-semibold">
-                  Предстоящи
+                  Предстоящи пътувания
                 </h2>
                 {upcomingPassengerRides.map((ride) => (
                   <div

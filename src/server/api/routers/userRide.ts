@@ -212,4 +212,60 @@ export const userRideRouter = createTRPCRouter({
 
   // TODO: Add a mutation to cancel a UserRide (setStatus to CANCELLED)
   // TODO: Add a query to get UserRide status for a specific route & user
+
+  cancelRide: protectedProcedure
+    .input(z.object({ routeId: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Find the user ride
+      const userRide = await db.userRide.findUnique({
+        where: {
+          userId_routeId: {
+            userId: userId,
+            routeId: input.routeId,
+          },
+        },
+        include: {
+          route: true,
+        },
+      });
+
+      // Check if the ride exists and is active
+      if (!userRide) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Не сте записани за този маршрут.",
+        });
+      }
+
+      if (userRide.status !== "ACTIVE") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Вече сте отказали този маршрут.",
+        });
+      }
+
+      // Check if the ride is in the past
+      if (new Date(userRide.route.dateTime) < new Date()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Не можете да откажете маршрут, който е в миналото.",
+        });
+      }
+
+      await db.userRide.delete({
+        where: {
+          userId_routeId: {
+            userId,
+            routeId: input.routeId,
+          },
+        },
+      });
+
+      return {
+        success: true,
+        message: "Успешно отказахте записването за маршрута.",
+      };
+    }),
 });

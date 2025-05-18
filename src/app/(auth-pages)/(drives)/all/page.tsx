@@ -27,7 +27,7 @@ export default function AllRoutesPage() {
       {!isLoading && !isError && (
         <div>
           {routes ? (
-            <ul className="space-y-4">
+            <ul className="flex flex-col space-y-4">
               {routes.map((route) => (
                 <Link key={route.id} href={`/${route.id}`}>
                   {/* Assuming the route object has an id, origin, destination, dateTime, and seats */}

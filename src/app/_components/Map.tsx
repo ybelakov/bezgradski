@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useMapStore } from "~/store/mapStore";
 import { api } from "~/trpc/react";
 import { ConfirmRouteDialog } from "./ConfirmRouteDialog";
+import { useRouter } from "next/navigation";
 
 const libraries: Libraries = ["places"];
 
@@ -20,6 +21,7 @@ export function Map() {
   const { origin, destination, directions, isSaving, setIsSaving } =
     useMapStore();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-route-display",
@@ -40,6 +42,7 @@ export function Map() {
       toast.success("Route saved successfully!");
       setIsSaving(false);
       setIsConfirmModalOpen(false);
+      router.push("/drives");
     },
     onError: (error) => {
       toast.error(`Failed to save route: ${error.message}`);
