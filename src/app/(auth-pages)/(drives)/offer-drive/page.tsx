@@ -3,7 +3,13 @@ import { Map } from "~/app/_components/Map";
 
 export default function OfferDrivePage() {
   return (
-    <div className="h-screen w-full pt-12" id="map-container">
+    <div
+      className="w-full overflow-hidden pt-12"
+      style={{
+        height: "100dvh",
+        overflow: "hidden",
+      }}
+    >
       <Map />
     </div>
   );

@@ -33,8 +33,11 @@ export function BaseDialog({
   return (
     <>
       <div
+        style={{
+          height: "100dvh",
+        }}
         className={cn(
-          "absolute top-0 z-[50] h-screen w-screen bg-black/50",
+          "absolute top-0 z-[50] w-screen bg-black/50",
           isOpen ? "block" : "hidden",
         )}
       />
