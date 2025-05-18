@@ -78,8 +78,19 @@ export function HomePage() {
               Без Градски - Споделено пътуване
             </DialogTitle>
             <TransportButtons />
-            <div className="mt-6 flex w-full justify-end">
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <div className="mt-6 flex w-full items-center justify-between">
+              <Button variant="ghost" size="sm">
+                <Link href="mailto:yavorbelakov@gmail.com">
+                  Обратна връзка/помощ
+                </Link>
+              </Button>
+
+              <Button
+                className="cursor-pointer"
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Изход
               </Button>
