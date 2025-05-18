@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type Route, type Prisma } from "@prisma/client";
+import { type Route, type Prisma, UserRideStatus } from "@prisma/client";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -214,5 +214,45 @@ export const routeRouter = createTRPCRouter({
       `;
 
       return routes;
+    }),
+
+  cancelRoute: protectedProcedure
+    .input(
+      z.object({
+        routeId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // First verify the user owns this route
+      const route = await ctx.db.route.findUnique({
+        where: { id: input.routeId },
+        include: { userRides: true },
+      });
+
+      if (!route) {
+        throw new Error("Route not found");
+      }
+
+      if (route.userId !== ctx.session.user.id) {
+        throw new Error("Not authorized to cancel this route");
+      }
+
+      // Update the route status to cancelled
+      const updatedRoute = await ctx.db.route.update({
+        where: { id: input.routeId },
+        data: {
+          status: UserRideStatus.CANCELLED,
+          // Also cancel all associated userRides
+          userRides: {
+            updateMany: {
+              where: { routeId: input.routeId },
+              data: { status: UserRideStatus.CANCELLED },
+            },
+          },
+        },
+        include: { userRides: true },
+      });
+
+      return updatedRoute;
     }),
 });

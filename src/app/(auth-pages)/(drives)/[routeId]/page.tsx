@@ -113,6 +113,14 @@ export default function RouteDetailsPage() {
     },
   });
 
+  const cancelRouteMutation = api.routes.cancelRoute.useMutation({
+    onSuccess: async () => {
+      // Invalidate queries to refetch data and update UI
+      await utils.routes.getById.invalidate({ id: routeId });
+      await utils.userRide.getRideStatusForRoute.invalidate({ routeId });
+    },
+  });
+
   if (isLoadingRoute || (session && isLoadingUserRideStatus)) {
     return <div className="flex justify-center p-12">Loading...</div>;
   }
@@ -132,13 +140,16 @@ export default function RouteDetailsPage() {
   // For now, don't allow sign up if previously cancelled. Can be changed later.
   const wasRideCancelledByUser = userRideStatus?.status === "CANCELLED";
 
+  const isRouteCancelled = route?.status === "CANCELLED";
+
   const canSignUp =
     session?.user &&
     !isRouteInPast &&
     !isUserCreator &&
     availableSeats > 0 &&
     !isActiveUserRide &&
-    !wasRideCancelledByUser;
+    !wasRideCancelledByUser &&
+    !isRouteCancelled;
 
   const handleSignUpClick = () => {
     setIsModalOpen(true);
@@ -197,7 +208,7 @@ export default function RouteDetailsPage() {
             Вече сте записани за този маршрут.
           </p>
         )}
-        {wasRideCancelledByUser && (
+        {wasRideCancelledByUser && !isRouteCancelled && (
           <p className="text-sm text-orange-600">
             Отказали сте се от този маршрут.
           </p>
@@ -205,10 +216,34 @@ export default function RouteDetailsPage() {
         {isRouteInPast && (
           <p className="text-sm text-red-600">Този маршрут е в миналото.</p>
         )}
+        {isRouteCancelled && (
+          <p className="mt-2 text-sm text-red-600">
+            Този маршрут е отказан от шофьора.
+          </p>
+        )}
       </div>
 
+      {/* Driver's Cancel Route Button */}
+      {isUserCreator && !isRouteInPast && !isRouteCancelled && (
+        <button
+          onClick={() => {
+            if (
+              confirm(
+                "Сигурни ли сте, че искате да откажете този маршрут? Това ще отмени всички записвания.",
+              )
+            ) {
+              cancelRouteMutation.mutate({ routeId });
+            }
+          }}
+          className="mb-6 rounded bg-red-500 px-6 py-2 text-white hover:bg-red-600 disabled:opacity-50"
+          disabled={cancelRouteMutation.isPending}
+        >
+          {cancelRouteMutation.isPending ? "Отказване..." : "Откажи маршрута"}
+        </button>
+      )}
+
       {/* Sign-up Button */}
-      {canSignUp && (
+      {canSignUp && !isRouteCancelled && (
         <button
           onClick={handleSignUpClick}
           className="mb-6 rounded bg-green-500 px-6 py-2 text-white hover:bg-green-600 disabled:opacity-50"

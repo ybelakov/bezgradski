@@ -91,6 +91,7 @@ model Route {
     directions  Json?    // Store the directions response as JSON
     dateTime    DateTime
     seats       Int?
+    status      UserRideStatus @default(ACTIVE)
     
     user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId      String
