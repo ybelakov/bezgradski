@@ -60,18 +60,22 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    phoneNumber   String?
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
     routes        Route[]
+    userRides     UserRide[]
 }
 
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
+    userId     String
 
     @@unique([identifier, token])
+    @@index([userId])
 }
 
 model Route {
@@ -90,6 +94,28 @@ model Route {
     
     user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId      String
+    userRides   UserRide[]
 
     @@index([userId])
+}
+
+enum UserRideStatus {
+    ACTIVE
+    CANCELLED
+}
+
+model UserRide {
+    id        String         @id @default(cuid())
+    status    UserRideStatus @default(ACTIVE)
+    createdAt DateTime       @default(now())
+    updatedAt DateTime       @updatedAt
+
+    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId  String
+    route   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade)
+    routeId String
+
+    @@unique([userId, routeId])
+    @@index([userId])
+    @@index([routeId])
 }

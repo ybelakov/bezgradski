@@ -93,6 +93,13 @@ export const routeRouter = createTRPCRouter({
           gte: new Date(),
         },
       },
+      include: {
+        _count: {
+          select: {
+            userRides: { where: { status: "ACTIVE" } },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
   }),
@@ -101,6 +108,14 @@ export const routeRouter = createTRPCRouter({
     return ctx.db.route.findMany({
       where: {
         userId: ctx.session.user.id,
+      },
+      include: {
+        user: true,
+        _count: {
+          select: {
+            userRides: { where: { status: "ACTIVE" } },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -112,7 +127,14 @@ export const routeRouter = createTRPCRouter({
       return ctx.db.route.findUnique({
         where: {
           id: input.id,
-          userId: ctx.session.user.id,
+        },
+        include: {
+          user: true,
+          _count: {
+            select: {
+              userRides: { where: { status: "ACTIVE" } },
+            },
+          },
         },
       });
     }),
@@ -186,6 +208,24 @@ export const routeRouter = createTRPCRouter({
         ORDER BY "dateTime" ASC;
       `;
 
-      return routes;
+      // Fetch the count of active rides for each route
+      const routesWithAvailableSeats = await Promise.all(
+        routes.map(async (route) => {
+          const activeRides = await ctx.db.userRide.count({
+            where: {
+              routeId: route.id,
+              status: "ACTIVE",
+            },
+          });
+
+          return {
+            ...route,
+            activeRidesCount: activeRides,
+            availableSeats: route.seats ? route.seats - activeRides : null,
+          };
+        }),
+      );
+
+      return routesWithAvailableSeats;
     }),
 });

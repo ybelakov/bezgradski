@@ -43,7 +43,8 @@ export default function AllRoutesPage() {
                         minute: "2-digit",
                       })}
                     </p>
-                    <p>Свободни места: {route.seats ?? "N/A"}</p>
+                    <p>Общо места: {route.seats ?? "N/A"}</p>
+                    <p>Свободни места: {route._count.userRides ?? "N/A"}</p>
                   </li>
                 </Link>
               ))}

@@ -60,12 +60,9 @@ export default function SearchDrivePage() {
   }
 
   return (
-    <div
-      className="flex h-full w-full items-center justify-center"
-      id="search-drive-container"
-    >
+    <div className="flex h-full w-full items-center justify-center">
       {/* Desktop view */}
-      <div className="fixed inset-0 z-40 hidden md:block">
+      <div className="fixed inset-0 top-12 z-40 pt-20">
         <div className="absolute inset-0 z-0">
           <Image
             src="/background-bg.jpg"

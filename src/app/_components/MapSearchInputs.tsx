@@ -50,7 +50,6 @@ export function MapSearchInputs({
   const onOriginChanged = () => {
     const place = originRef?.current?.getPlace();
     if (!place?.geometry?.location || !place.formatted_address) {
-      alert("No details available for input: '" + place?.name + "'");
       return;
     }
 
@@ -78,7 +77,6 @@ export function MapSearchInputs({
   const onDestinationChanges = () => {
     const place = destinationRef?.current?.getPlace();
     if (!place?.geometry?.location || !place.formatted_address) {
-      alert("No details available for input: '" + place?.name + "'");
       return;
     }
 

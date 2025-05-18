@@ -135,7 +135,8 @@ export default function SearchResultsPage() {
                         ? new Date(route.dateTime).toLocaleTimeString()
                         : "N/A"}
                     </p>
-                    <p>Свободни места: {route.seats ?? "N/A"}</p>
+                    <p>Общо места: {route.seats ?? "N/A"}</p>
+                    <p>Свободни места: {route.availableSeats ?? "N/A"}</p>
                   </li>
                 </Link>
               ))}
