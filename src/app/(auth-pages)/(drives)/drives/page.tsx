@@ -175,7 +175,7 @@ export default function DrivesPage() {
                                 className="flex items-center gap-2 rounded bg-gray-50 p-2"
                               >
                                 {passenger.user.image && (
-                                  <Image
+                                  <img
                                     src={passenger.user.image}
                                     alt={
                                       passenger.user.name ?? "Профилна снимка"
@@ -191,7 +191,13 @@ export default function DrivesPage() {
                                   </p>
                                   {passenger.user.phoneNumber && (
                                     <p className="text-sm text-gray-600">
-                                      Тел: {passenger.user.phoneNumber}
+                                      Тел:{" "}
+                                      <a
+                                        href={`tel:${passenger.user.phoneNumber}`}
+                                        className="hover:underline"
+                                      >
+                                        {passenger.user.phoneNumber}
+                                      </a>
                                     </p>
                                   )}
                                 </div>
@@ -262,7 +268,7 @@ export default function DrivesPage() {
                                 className="flex items-center gap-2 rounded bg-gray-50 p-2"
                               >
                                 {passenger.user.image && (
-                                  <Image
+                                  <img
                                     src={passenger.user.image}
                                     alt={
                                       passenger.user.name ?? "Профилна снимка"
@@ -278,7 +284,13 @@ export default function DrivesPage() {
                                   </p>
                                   {passenger.user.phoneNumber && (
                                     <p className="text-sm text-gray-600">
-                                      Тел: {passenger.user.phoneNumber}
+                                      Тел:{" "}
+                                      <a
+                                        href={`tel:${passenger.user.phoneNumber}`}
+                                        className="hover:underline"
+                                      >
+                                        {passenger.user.phoneNumber}
+                                      </a>
                                     </p>
                                   )}
                                 </div>
@@ -330,7 +342,7 @@ export default function DrivesPage() {
                       <h3 className="font-medium">Шофьор:</h3>
                       <div className="mt-2 flex items-center gap-2">
                         {ride.route.user.image && (
-                          <Image
+                          <img
                             src={ride.route.user.image}
                             alt={ride.route.user.name ?? "Профилна снимка"}
                             className="h-8 w-8 rounded-full"
@@ -344,7 +356,13 @@ export default function DrivesPage() {
                           </p>
                           {ride.route.user.phoneNumber && (
                             <p className="text-sm text-gray-600">
-                              Тел: {ride.route.user.phoneNumber}
+                              Тел:{" "}
+                              <a
+                                href={`tel:${ride.route.user.phoneNumber}`}
+                                className="hover:underline"
+                              >
+                                {ride.route.user.phoneNumber}
+                              </a>
                             </p>
                           )}
                         </div>
@@ -387,7 +405,7 @@ export default function DrivesPage() {
                       <h3 className="font-medium">Шофьор:</h3>
                       <div className="mt-2 flex items-center gap-2">
                         {ride.route.user.image && (
-                          <Image
+                          <img
                             src={ride.route.user.image}
                             alt={ride.route.user.name ?? "Профилна снимка"}
                             className="h-8 w-8 rounded-full"
@@ -401,7 +419,13 @@ export default function DrivesPage() {
                           </p>
                           {ride.route.user.phoneNumber && (
                             <p className="text-sm text-gray-600">
-                              Тел: {ride.route.user.phoneNumber}
+                              Тел:{" "}
+                              <a
+                                href={`tel:${ride.route.user.phoneNumber}`}
+                                className="hover:underline"
+                              >
+                                {ride.route.user.phoneNumber}
+                              </a>
                             </p>
                           )}
                         </div>

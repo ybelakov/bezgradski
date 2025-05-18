@@ -105,8 +105,8 @@ export default function RouteDetailsPage() {
     },
   });
 
-  if (isLoadingRoute || (session && isLoadingUserRideStatus))
-    return <p>Зареждане...</p>; // Adjusted loading state
+  if (isLoadingRoute || (session && isLoadingUserRideStatus)) return null;
+
   if (isRouteError) return <p>Error fetching route: {routeError?.message}</p>;
   if (!route) return <p>Route not found.</p>;
 

@@ -129,14 +129,23 @@ export default function SearchResultsPage() {
                       {route.origin} - {route.destination}
                     </h3>
 
-                    <p>
-                      Час на тръгване:{" "}
-                      {route.dateTime
-                        ? new Date(route.dateTime).toLocaleTimeString()
-                        : "N/A"}
-                    </p>
-                    <p>Общо места: {route.seats ?? "N/A"}</p>
-                    <p>Свободни места: {route.availableSeats ?? "N/A"}</p>
+                    {route.dateTime ? (
+                      <p>
+                        {" "}
+                        Дата: {new Date(route.dateTime).toLocaleDateString()}
+                      </p>
+                    ) : null}
+
+                    {route.dateTime ? (
+                      <p>
+                        Час на тръгване:{" "}
+                        {new Date(route.dateTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                        ч.
+                      </p>
+                    ) : null}
                   </li>
                 </Link>
               ))}

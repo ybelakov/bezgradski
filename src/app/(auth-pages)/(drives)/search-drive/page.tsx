@@ -93,7 +93,11 @@ export default function SearchDrivePage() {
             />
             {/* TODO: Add other search fields like date, passengers */}
             <div className="flex flex-col gap-2">
-              <Button onClick={handleSearch} className="w-full">
+              <Button
+                onClick={handleSearch}
+                disabled={!searchOrigin || !searchDestination || !searchDate}
+                className="w-full"
+              >
                 Търси
               </Button>
               <Button
