@@ -53,7 +53,11 @@ export default function DrivesPage() {
     (!myRoutes || myRoutes.length === 0) &&
     (!passengerRides || passengerRides.length === 0)
   ) {
-    return null;
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        Нямате пътувания все още
+      </div>
+    );
   }
 
   // Get current date and time
