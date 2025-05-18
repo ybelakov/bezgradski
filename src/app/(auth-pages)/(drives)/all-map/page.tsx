@@ -26,6 +26,18 @@ const ROUTE_COLORS = [
   "#795548", // Brown
   "#607D8B", // Blue Grey
   "#E91E63", // Pink
+  "#3F51B5", // Indigo
+  "#FFEB3B", // Yellow
+  "#FF4081", // Pink A400
+  "#8BC34A", // Light Green
+  "#FF5722", // Deep Orange
+  "#673AB7", // Deep Purple
+  "#CDDC39", // Lime
+  "#FF9800", // Orange A400
+  "#00BCD4", // Cyan
+  "#9E9E9E", // Grey
+  "#F44336", // Red A400
+  "#2196F3", // Blue A400
 ];
 
 export default function AllRoutesMapPage() {
