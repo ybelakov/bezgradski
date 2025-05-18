@@ -98,7 +98,7 @@ export function GoogleMapWithDirections({
         {directions && (
           <DirectionsRenderer
             directions={directions}
-            options={{ draggable: true }}
+            options={{ draggable: false }}
             onLoad={(renderer) => {
               directionsRendererRef.current = renderer;
             }}
