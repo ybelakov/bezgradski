@@ -22,11 +22,17 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useSession } from "next-auth/react";
 
 interface ConfirmRouteDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (dateTime: Date, time: string, seats: number) => void;
+  onConfirm: (
+    dateTime: Date,
+    time: string,
+    seats: number,
+    phoneNumber: string,
+  ) => void;
   isSaving: boolean;
 }
 
@@ -36,20 +42,29 @@ export function ConfirmRouteDialog({
   onConfirm,
   isSaving,
 }: ConfirmRouteDialogProps) {
-  const [date, setDate] = React.useState<Date | undefined>();
-  const [time, setTime] = React.useState<string>("");
-  const [seats, setSeats] = React.useState<number | undefined>();
+  const [date, setDate] = React.useState<Date | undefined>(
+    new Date(new Date().setDate(new Date().getDate() + 1)),
+  );
+  const [time, setTime] = React.useState<string>("08:00");
+  const [seats, setSeats] = React.useState<number | undefined>(4);
+  const [phoneNumber, setPhoneNumber] = React.useState<string>();
   const [isCalendarOpen, setIsCalendarOpen] = React.useState<boolean>(false);
 
+  const { data: session } = useSession();
+
+  React.useEffect(() => {
+    if (!session?.user.phoneNumber) return;
+    setPhoneNumber(session.user.phoneNumber);
+  }, [session?.user.phoneNumber]);
   const handleConfirm = () => {
-    if (date && time && seats !== undefined) {
+    if (date && time && seats !== undefined && phoneNumber) {
       const [hours, minutes] = time.split(":").map(Number);
       const combinedDateTime = new Date(date);
       if (hours !== undefined && minutes !== undefined) {
         combinedDateTime.setHours(hours);
         combinedDateTime.setMinutes(minutes);
       }
-      onConfirm(combinedDateTime, time, seats);
+      onConfirm(combinedDateTime, time, seats, phoneNumber);
     }
   };
 
@@ -67,7 +82,7 @@ export function ConfirmRouteDialog({
         <DialogHeader>
           <DialogTitle>Потвърди</DialogTitle>
           <DialogDescription>
-            Моля, въвведете датата, часа и наличните места за този маршрут.
+            Моля, въведете датата, часа и наличните места за този маршрут.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -128,6 +143,19 @@ export function ConfirmRouteDialog({
               min="1"
             />
           </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="phoneNumber" className="text-right">
+              Телефон
+            </Label>
+            <Input
+              id="phoneNumber"
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="col-span-3"
+              placeholder="0888 123 456"
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
@@ -136,9 +164,11 @@ export function ConfirmRouteDialog({
           <Button
             type="submit"
             onClick={handleConfirm}
-            disabled={!date || !time || seats === undefined || isSaving}
+            disabled={
+              !date || !time || seats === undefined || !phoneNumber || isSaving
+            }
           >
-            {isSaving ? "Saving..." : "Confirm & Save Route"}
+            {isSaving ? "Запазване..." : "Запази"}
           </Button>
         </DialogFooter>
       </DialogContent>

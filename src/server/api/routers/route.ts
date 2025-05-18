@@ -42,6 +42,7 @@ export const routeRouter = createTRPCRouter({
         directions: z.any(), // Reverted to z.any() for input to Prisma
         dateTime: z.date(),
         seats: z.number().int().optional(),
+        phoneNumber: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -51,6 +52,10 @@ export const routeRouter = createTRPCRouter({
       let destinationLng: number | undefined;
 
       try {
+        await ctx.db.user.update({
+          where: { id: ctx.session.user.id },
+          data: { phoneNumber: input.phoneNumber },
+        });
         // Parse input.directions using our more specific schema for safe access
         const parsedDirections = directionsSchema.safeParse(input.directions);
 

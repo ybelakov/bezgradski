@@ -39,7 +39,7 @@ export function Map() {
 
   const saveRouteMutation = api.routes.create.useMutation({
     onSuccess: () => {
-      toast.success("Route saved successfully!");
+      toast.success("Маршрутът е записан!");
       setIsSaving(false);
       setIsConfirmModalOpen(false);
       router.push("/drives");
@@ -54,6 +54,7 @@ export function Map() {
     dateTime: Date,
     _time: string,
     seats: number,
+    phoneNumber: string,
   ) => {
     if (!session?.user.id || !origin || !destination || !directions) {
       toast.error("Cannot save route. Missing required information.");
@@ -68,6 +69,7 @@ export function Map() {
         directions,
         dateTime,
         seats,
+        phoneNumber,
       });
     } catch (error: unknown) {
       toast.error(`Failed to save route: ${(error as Error).message}`);
