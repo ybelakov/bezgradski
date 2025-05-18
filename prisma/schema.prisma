@@ -78,10 +78,14 @@ model Route {
     id          String   @id @default(cuid())
     origin      String
     destination String
+    originLat   Float?    // Extracted from directions
+    originLng   Float?    // Extracted from directions
+    destinationLat Float? // Extracted from directions
+    destinationLng Float? // Extracted from directions
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     directions  Json?    // Store the directions response as JSON
-    dateTime    DateTime?
+    dateTime    DateTime
     seats       Int?
     
     user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)

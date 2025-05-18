@@ -2,17 +2,13 @@ import { useJsApiLoader } from "@react-google-maps/api";
 import type { Libraries } from "@react-google-maps/api";
 import { env } from "~/env";
 import { useCallback, useRef, useState } from "react";
-import { MapControls } from "./MapControls";
-import { MapSearchInputs } from "./MapSearchInputs";
 import { GoogleMapWithDirections } from "./GoogleMapWithDirections";
-import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
-import { cn } from "~/lib/utils";
+import { RouteCreationDialog } from "./RouteCreationDialog";
 import { Button } from "~/components/ui/button";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useMapStore } from "~/store/mapStore";
 import { api } from "~/trpc/react";
-import { XIcon } from "lucide-react";
 import { ConfirmRouteDialog } from "./ConfirmRouteDialog";
 
 const libraries: Libraries = ["places"];
@@ -26,7 +22,7 @@ export function Map() {
   const { data: session } = useSession();
 
   const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
+    id: "google-map-route-display",
     googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_JAVASCRIPT_API_KEY,
     libraries,
   });
@@ -63,20 +59,18 @@ export function Map() {
 
     setIsSaving(true);
     try {
-      const directionsData = JSON.parse(JSON.stringify(directions)) as Record<
-        string,
-        unknown
-      >;
       await saveRouteMutation.mutateAsync({
         origin,
         destination,
-        directions: directionsData,
+        directions,
         dateTime,
         seats,
       });
     } catch (error: unknown) {
       toast.error(`Failed to save route: ${(error as Error).message}`);
       setIsSaving(false);
+    } finally {
+      setIsConfirmModalOpen(false);
     }
   };
 
@@ -86,25 +80,12 @@ export function Map() {
 
   return (
     <>
-      <div
-        className={cn(
-          "absolute top-0 z-[50] h-screen w-screen bg-black/50",
-          isModalOpen ? "block" : "hidden",
-        )}
+      <RouteCreationDialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isLoaded={isLoaded}
+        mapRef={mapRef}
       />
-      <Dialog open={isModalOpen} modal={false}>
-        <DialogContent className="z-[100]" hideXIcon>
-          <XIcon
-            className="absolute top-2 right-2 cursor-pointer"
-            onClick={() => setIsModalOpen(false)}
-          />
-          <DialogTitle className="text-center">Маршрут</DialogTitle>
-          <div className="flex flex-col gap-4 p-1">
-            <MapSearchInputs isLoaded={isLoaded} mapRef={mapRef} />
-            <MapControls />
-          </div>
-        </DialogContent>
-      </Dialog>
       <Button
         className="absolute top-1 right-1"
         onClick={() => {
@@ -126,7 +107,7 @@ export function Map() {
       {/* Confirmation Dialog */}
       <ConfirmRouteDialog
         open={isConfirmModalOpen}
-        onOpenChange={setIsConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleSaveRouteConfirmed}
         isSaving={isSaving}
       />

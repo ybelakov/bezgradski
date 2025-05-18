@@ -25,20 +25,21 @@ import { Label } from "~/components/ui/label";
 
 interface ConfirmRouteDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onConfirm: (dateTime: Date, time: string, seats: number) => void;
   isSaving: boolean;
 }
 
 export function ConfirmRouteDialog({
   open,
-  onOpenChange,
+  onClose,
   onConfirm,
   isSaving,
 }: ConfirmRouteDialogProps) {
   const [date, setDate] = React.useState<Date | undefined>();
   const [time, setTime] = React.useState<string>("");
   const [seats, setSeats] = React.useState<number | undefined>();
+  const [isCalendarOpen, setIsCalendarOpen] = React.useState<boolean>(false);
 
   const handleConfirm = () => {
     if (date && time && seats !== undefined) {
@@ -53,20 +54,20 @@ export function ConfirmRouteDialog({
   };
 
   const handleClose = () => {
-    onOpenChange(false);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open}>
       <DialogContent className="sm:max-w-[425px]" hideXIcon>
         <XIcon
           className="absolute top-2 right-2 cursor-pointer"
-          onClick={handleClose}
+          onClick={onClose}
         />
         <DialogHeader>
-          <DialogTitle>Confirm Route Details</DialogTitle>
+          <DialogTitle>Потвърди</DialogTitle>
           <DialogDescription>
-            Please provide the date, time, and available seats for this route.
+            Моля, въвведете датата, часа и наличните места за този маршрут.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -74,7 +75,7 @@ export function ConfirmRouteDialog({
             <Label htmlFor="date" className="text-right">
               Date
             </Label>
-            <Popover>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
@@ -84,14 +85,19 @@ export function ConfirmRouteDialog({
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  {date ? format(date, "PPP") : <span>Дата</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(selectedDate) => {
+                    setDate(selectedDate);
+                    setIsCalendarOpen(false);
+                  }}
+                  fromDate={new Date()}
+                  toDate={new Date(new Date().getFullYear(), 11, 31)}
                   initialFocus
                 />
               </PopoverContent>
@@ -99,7 +105,7 @@ export function ConfirmRouteDialog({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="time" className="text-right">
-              Time
+              Час
             </Label>
             <Input
               id="time"
@@ -111,7 +117,7 @@ export function ConfirmRouteDialog({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="seats" className="text-right">
-              Seats
+              Места
             </Label>
             <Input
               id="seats"
