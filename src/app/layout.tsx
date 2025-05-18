@@ -10,8 +10,26 @@ import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Без градски - намери превоз",
-  description: "Без градски",
+  description:
+    "Намери или предложи превоз в България. Споделено пътуване без градски транспорт.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  openGraph: {
+    title: "Без градски - намери превоз",
+    description:
+      "Намери или предложи превоз в София. Споделено пътуване без градски транспорт.",
+    type: "website",
+    locale: "bg_BG",
+    url: "https://bezgradski.bg",
+    siteName: "Без градски",
+    images: [
+      {
+        url: "/og-image.png", // You'll need to add this image to your public folder
+        width: 1200,
+        height: 630,
+        alt: "Без градски - споделено пътуване",
+      },
+    ],
+  },
 };
 
 const geist = Geist({
