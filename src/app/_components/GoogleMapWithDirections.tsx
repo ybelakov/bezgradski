@@ -59,9 +59,15 @@ export function GoogleMapWithDirections({
 
   const onDirectionsChanged = useCallback(() => {
     if (directionsRendererRef.current) {
-      console.log("Directions changed by user dragging");
+      const newDirections = directionsRendererRef.current.getDirections();
+      if (
+        newDirections &&
+        JSON.stringify(newDirections) !== JSON.stringify(directions)
+      ) {
+        setDirections(newDirections);
+      }
     }
-  }, []);
+  }, [setDirections, directions]);
 
   return (
     <div className="h-full w-full">
