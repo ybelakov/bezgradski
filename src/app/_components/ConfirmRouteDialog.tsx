@@ -90,7 +90,11 @@ export function ConfirmRouteDialog({
             <Label htmlFor="date" className="text-right">
               Date
             </Label>
-            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <Popover
+              open={isCalendarOpen}
+              onOpenChange={setIsCalendarOpen}
+              modal={true}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
