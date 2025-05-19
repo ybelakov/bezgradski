@@ -5,6 +5,7 @@ A modern web application built with the T3 Stack, featuring Next.js, tRPC, Prism
 ## Demo
 
 Watch our demo video to see the application in action:
+https://www.loom.com/share/f99bbe6a5a2240ee8a6dc14a03af1a33
 
 [![Bez Gradski Demo](https://cdn.loom.com/sessions/thumbnails/f99bbe6a5a2240ee8a6dc14a03af1a33-with-play.gif)](https://www.loom.com/share/f99bbe6a5a2240ee8a6dc14a03af1a33)
 
