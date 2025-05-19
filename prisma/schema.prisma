@@ -108,6 +108,7 @@ model Route {
     @@index([dateTime])
     @@index([status])
     @@index([origin, destination])
+    @@index([dateTime, status])
 }
 
 enum UserRideStatus {
