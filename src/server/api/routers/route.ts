@@ -96,20 +96,29 @@ export const routeRouter = createTRPCRouter({
       z
         .object({
           date: z.date().optional(),
+          limit: z.number().min(1).max(100).default(10),
+          cursor: z.string().nullish(),
         })
         .optional(),
     )
     .query(async ({ ctx, input }) => {
       const now = new Date();
-      now.setHours(0, 0, 0, 0);
 
       const startDate = input?.date ?? now;
-      startDate.setHours(0, 0, 0, 0);
+      // const startDate = input?.date ?? now;
+      if (input?.date && input?.date?.getTime() >= now.getTime()) {
+        startDate.setHours(0, 0, 0, 0);
+      }
 
       const endDate = new Date(startDate);
       endDate.setHours(23, 59, 59, 999);
 
-      return ctx.db.route.findMany({
+      const limit = input?.limit ?? 10;
+      const cursor = input?.cursor;
+
+      const items = await ctx.db.route.findMany({
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
         where: {
           dateTime: input?.date
             ? {
@@ -121,15 +130,21 @@ export const routeRouter = createTRPCRouter({
               },
           status: "ACTIVE",
         },
-        include: {
-          _count: {
-            select: {
-              userRides: { where: { status: "ACTIVE" } },
-            },
-          },
+        orderBy: {
+          dateTime: "asc",
         },
-        orderBy: { dateTime: "asc" },
       });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (items.length > limit) {
+        const nextItem = items.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        items,
+        nextCursor,
+      };
     }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {

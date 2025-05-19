@@ -2,6 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import {
   useJsApiLoader,
@@ -14,6 +15,7 @@ import type { Libraries } from "@react-google-maps/api";
 import {
   RouteFilters,
   type FilterType,
+  type ViewType,
   getFilterDate,
 } from "~/components/RouteFilters";
 
@@ -46,6 +48,7 @@ const ROUTE_COLORS = [
 ];
 
 export default function AllRoutesMapPage() {
+  const router = useRouter();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-route-display",
     googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_JAVASCRIPT_API_KEY,
@@ -57,16 +60,18 @@ export default function AllRoutesMapPage() {
     string | number | null
   >(null);
 
+  const handleViewChange = (view: ViewType) => {
+    if (view === "list") {
+      router.push("/all");
+    }
+  };
+
   const filterDate = useMemo(
     () => getFilterDate(selectedFilter),
     [selectedFilter],
   );
 
-  const {
-    data: routes,
-    isLoading,
-    isError,
-  } = api.routes.getAllUpcoming.useQuery({
+  const { data, isLoading, isError } = api.routes.getAllUpcoming.useQuery({
     date: filterDate,
   });
 
@@ -77,6 +82,8 @@ export default function AllRoutesMapPage() {
   if (isError) {
     return <div className="p-12 text-red-500">Error loading routes</div>;
   }
+
+  const routes = data?.items;
 
   // Filter routes that have directions
   const routesWithDirections = routes?.filter((route) => route.directions);
@@ -92,6 +99,8 @@ export default function AllRoutesMapPage() {
           <RouteFilters
             selectedFilter={selectedFilter}
             onFilterChange={setSelectedFilter}
+            selectedView="map"
+            onViewChange={handleViewChange}
           />
         </div>
       </div>
@@ -121,14 +130,6 @@ export default function AllRoutesMapPage() {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </p>
-              )}
-              {typeof selectedRoute.seats === "number" && (
-                <p className="text-sm">
-                  Свободни места:{" "}
-                  {(selectedRoute.seats ?? 0) -
-                    (selectedRoute._count?.userRides ?? 0)}{" "}
-                  / {selectedRoute.seats}
                 </p>
               )}
             </div>

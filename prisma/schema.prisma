@@ -44,6 +44,7 @@ model Account {
     refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
@@ -52,6 +53,9 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([expires])
 }
 
 model User {
@@ -66,6 +70,9 @@ model User {
     posts         Post[]
     routes        Route[]
     userRides     UserRide[]
+
+    @@index([email])
+    @@index([phoneNumber])
 }
 
 model VerificationToken {
@@ -98,6 +105,9 @@ model Route {
     userRides   UserRide[]
 
     @@index([userId])
+    @@index([dateTime])
+    @@index([status])
+    @@index([origin, destination])
 }
 
 enum UserRideStatus {
