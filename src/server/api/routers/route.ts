@@ -97,15 +97,19 @@ export const routeRouter = createTRPCRouter({
         .object({
           date: z.date().optional(),
           limit: z.number().min(1).max(100).default(10),
-          cursor: z.string().nullish(),
+          cursor: z
+            .object({
+              id: z.string(),
+              dateTime: z.date(),
+            })
+            .optional(),
         })
         .optional(),
     )
     .query(async ({ ctx, input }) => {
       const now = new Date();
-
       const startDate = input?.date ?? now;
-      // const startDate = input?.date ?? now;
+
       if (input?.date && input?.date?.getTime() >= now.getTime()) {
         startDate.setHours(0, 0, 0, 0);
       }
@@ -118,27 +122,50 @@ export const routeRouter = createTRPCRouter({
 
       const items = await ctx.db.route.findMany({
         take: limit + 1,
-        cursor: cursor ? { id: cursor } : undefined,
         where: {
-          dateTime: input?.date
-            ? {
-                gte: startDate,
-                lte: endDate,
-              }
-            : {
-                gte: now,
-              },
-          status: "ACTIVE",
+          AND: [
+            {
+              dateTime: input?.date
+                ? {
+                    gte: startDate,
+                    lte: endDate,
+                  }
+                : {
+                    gte: now,
+                  },
+            },
+            {
+              status: "ACTIVE",
+            },
+            cursor
+              ? {
+                  OR: [
+                    {
+                      dateTime: {
+                        gt: cursor.dateTime,
+                      },
+                    },
+                    {
+                      AND: [
+                        { dateTime: cursor.dateTime },
+                        { id: { gt: cursor.id } },
+                      ],
+                    },
+                  ],
+                }
+              : {},
+          ],
         },
-        orderBy: {
-          dateTime: "asc",
-        },
+        orderBy: [{ dateTime: "asc" }, { id: "asc" }],
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {
         const nextItem = items.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = {
+          id: nextItem!.id,
+          dateTime: nextItem!.dateTime,
+        };
       }
 
       return {
