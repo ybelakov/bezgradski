@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { TRPCError } from "@trpc/server";
+import { getTranslations } from "next-intl/server";
 // import { UserRideStatus } from "@prisma/client"; // Import the enum - no longer needed
 
 export const userRideRouter = createTRPCRouter({
@@ -14,6 +15,7 @@ export const userRideRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
+      const t = await getTranslations();
 
       // 1. Fetch Route details
       const route = await db.route.findUnique({
@@ -29,7 +31,7 @@ export const userRideRouter = createTRPCRouter({
       if (!route) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Маршрутът не е намерен.",
+          message: t("route_not_found"),
         });
       }
 
@@ -37,14 +39,14 @@ export const userRideRouter = createTRPCRouter({
       if (route.userId === userId) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Не можете да се запишете за собствения си маршрут.",
+          message: t("cannot_sign_up_for_own_route"),
         });
       }
 
       if (new Date(route.dateTime) < new Date()) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Този маршрут е в миналото.",
+          message: t("this_route_is_in_the_past"),
         });
       }
 
@@ -62,7 +64,7 @@ export const userRideRouter = createTRPCRouter({
           // Use string literal
           throw new TRPCError({
             code: "CONFLICT",
-            message: "Вече сте записани за този маршрут.",
+            message: t("already_signed_up_for_route"),
           });
         } else if (existingSignUp.status === "CANCELLED") {
           // Use string literal
@@ -70,8 +72,7 @@ export const userRideRouter = createTRPCRouter({
           // For now, let's throw an error and handle re-activation/new sign up later if needed
           throw new TRPCError({
             code: "CONFLICT",
-            message:
-              "Преди това сте отказали този маршрут. Моля, свържете се с поддръжката, за да се запишете отново.",
+            message: t("already_cancelled_for_route_contact_service"),
           });
         }
       }
@@ -80,7 +81,7 @@ export const userRideRouter = createTRPCRouter({
       if (availableSeats <= 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Няма свободни места за този маршрут.",
+          message: t("no_seats_available_for_route"),
         });
       }
 
@@ -109,7 +110,7 @@ export const userRideRouter = createTRPCRouter({
       return {
         success: true,
         userRideId: newUserRide.id,
-        message: "Успешно се записахте за пътуването!",
+        message: t("successfully_signed_up_for_route"),
       };
     }),
 
@@ -167,6 +168,7 @@ export const userRideRouter = createTRPCRouter({
   getPassengersForRoute: protectedProcedure
     .input(z.object({ routeId: z.string().cuid() }))
     .query(async ({ ctx, input }) => {
+      const t = await getTranslations();
       const route = await db.route.findUnique({
         where: {
           id: input.routeId,
@@ -179,7 +181,7 @@ export const userRideRouter = createTRPCRouter({
       if (!route) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Route not found",
+          message: t("route_not_found"),
         });
       }
 
@@ -187,7 +189,7 @@ export const userRideRouter = createTRPCRouter({
       if (route.userId !== ctx.session.user.id) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Only the route owner can view passengers",
+          message: t("only_route_owner_can_view_passengers"),
         });
       }
 
@@ -217,6 +219,7 @@ export const userRideRouter = createTRPCRouter({
     .input(z.object({ routeId: z.string().cuid() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
+      const t = await getTranslations();
 
       // Find the user ride
       const userRide = await db.userRide.findUnique({
@@ -235,14 +238,14 @@ export const userRideRouter = createTRPCRouter({
       if (!userRide) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Не сте записани за този маршрут.",
+          message: t("not_signed_up_for_route"),
         });
       }
 
       if (userRide.status !== "ACTIVE") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Вече сте отказали този маршрут.",
+          message: t("already_cancelled_for_route"),
         });
       }
 
@@ -250,7 +253,7 @@ export const userRideRouter = createTRPCRouter({
       if (new Date(userRide.route.dateTime) < new Date()) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Не можете да откажете маршрут, който е в миналото.",
+          message: t("cannot_cancel_past_route"),
         });
       }
 
@@ -265,7 +268,7 @@ export const userRideRouter = createTRPCRouter({
 
       return {
         success: true,
-        message: "Успешно отказахте записването за маршрута.",
+        message: t("successfully_cancelled_ride"),
       };
     }),
 });

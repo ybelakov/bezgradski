@@ -1,7 +1,9 @@
+import { useTranslations } from "next-intl";
 import { Button } from "~/components/ui/button";
 import { useMapStore } from "~/store/mapStore";
 
 export function MapControls() {
+  const t = useTranslations();
   const { origin, destination, directions, setShouldFetchDirections } =
     useMapStore();
 
@@ -17,7 +19,7 @@ export function MapControls() {
         onClick={() => setShouldFetchDirections(true)}
         disabled={!origin || !destination}
       >
-        Продължи
+        {t("continue")}
       </Button>
     </div>
   );

@@ -7,6 +7,7 @@ import { api } from "~/trpc/react";
 // import { useEffect } from "react";
 import { RouteDisplayMap } from "~/app/_components/RouteDisplayMap"; // Import the new map component
 import { useState } from "react"; // For modal state
+import { useTranslations } from "next-intl";
 
 // Define a simple modal component (can be moved to a separate file later)
 // For now, keeping it in the same file for brevity.
@@ -27,21 +28,22 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isLoading,
 }) => {
   const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
+  const t = useTranslations();
 
   if (!isOpen) return null;
 
   return (
     <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
       <div className="rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-xl font-semibold">Потвърдете записването</h2>
-        <p className="mb-4">
-          Моля, въведете или потвърдете телефонния си номер:
-        </p>
+        <h2 className="mb-4 text-xl font-semibold">
+          {t("confirmation_title")}
+        </h2>
+        <p className="mb-4">{t("phone_prompt")}</p>
         <input
           type="tel"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="Телефонен номер"
+          placeholder={t("phone_placeholder")}
           className="mb-4 w-full rounded border p-2"
         />
         <div className="flex justify-end space-x-2">
@@ -50,14 +52,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             disabled={isLoading}
             className="rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400 disabled:opacity-50"
           >
-            Отказ
+            {t("cancel")}
           </button>
           <button
             onClick={() => onConfirm(phoneNumber)}
             disabled={isLoading || !phoneNumber.trim()}
             className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
           >
-            {isLoading ? "Записване..." : "Потвърди"}
+            {isLoading ? t("signing_up") : t("confirm")}
           </button>
         </div>
       </div>
@@ -70,6 +72,7 @@ export default function RouteDetailsPage() {
   const routeId = params.routeId as string;
   const { data: session } = useSession(); // Get session data
   const utils = api.useUtils(); // For invalidating queries
+  const t = useTranslations();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -164,62 +167,57 @@ export default function RouteDetailsPage() {
 
   return (
     <div className="container mx-auto p-4 pt-12">
-      <h1 className="mb-4 text-2xl font-bold">Информация за маршрута</h1>
+      <h1 className="mb-4 text-2xl font-bold">{t("route_details")}</h1>
       <div className="mb-6 rounded bg-gray-100 p-4 shadow">
         <p>
-          <strong>Шофьор:</strong>{" "}
+          <strong>{t("driver")}:</strong>{" "}
           {route.user?.name ?? route.user?.email ?? "N/A"}
         </p>
         {route.user?.phoneNumber ? (
           <p>
-            <strong>Тел за връзка:</strong> {route.user?.phoneNumber ?? ""}
+            <strong>{t("contact_phone")}:</strong>{" "}
+            {route.user?.phoneNumber ?? ""}
           </p>
         ) : null}
         <p>
-          <strong>Начална точка:</strong> {route.origin}
+          <strong>{t("start_point")}:</strong> {route.origin}
         </p>
         <p>
-          <strong>Дестинация:</strong> {route.destination}
+          <strong>{t("destination")}:</strong> {route.destination}
         </p>
         <p>
-          <strong>Дата:</strong>{" "}
+          <strong>{t("date")}:</strong>{" "}
           {route.dateTime
             ? new Date(route.dateTime).toLocaleDateString()
             : "N/A"}
         </p>
         <p>
-          <strong>Час:</strong>{" "}
+          <strong>{t("time")}:</strong>{" "}
           {route.dateTime
             ? new Date(route.dateTime).toLocaleTimeString()
             : "N/A"}
         </p>
         <p>
-          <strong>Общо места:</strong> {totalSeats}
+          <strong>{t("total_seats")}:</strong> {totalSeats}
         </p>
         <p>
-          <strong>Свободни места:</strong>{" "}
-          {availableSeats > 0 ? availableSeats : "Няма свободни места"}
+          <strong>{t("available_seats")}:</strong>{" "}
+          {availableSeats > 0 ? availableSeats : t("no_seats")}
         </p>
         {isUserCreator && (
-          <p className="text-sm text-green-600">Това е ваш маршрут.</p>
+          <p className="text-sm text-green-600">{t("your_route")}</p>
         )}
         {isActiveUserRide && (
-          <p className="text-sm text-blue-600">
-            Вече сте записани за този маршрут.
-          </p>
+          <p className="text-sm text-blue-600">{t("already_registered")}</p>
         )}
         {wasRideCancelledByUser && !isRouteCancelled && (
-          <p className="text-sm text-orange-600">
-            Отказали сте се от този маршрут.
-          </p>
+          <p className="text-sm text-orange-600">{t("cancelled_by_user")}</p>
         )}
         {isRouteInPast && (
-          <p className="text-sm text-red-600">Този маршрут е в миналото.</p>
+          <p className="text-sm text-red-600">{t("route_in_past")}</p>
         )}
         {isRouteCancelled && (
-          <p className="mt-2 text-sm text-red-600">
-            Този маршрут е отказан от шофьора.
-          </p>
+          <p className="mt-2 text-sm text-red-600">{t("route_cancelled")}</p>
         )}
       </div>
 
@@ -227,18 +225,14 @@ export default function RouteDetailsPage() {
       {isUserCreator && !isRouteInPast && !isRouteCancelled && (
         <button
           onClick={() => {
-            if (
-              confirm(
-                "Сигурни ли сте, че искате да откажете този маршрут? Това ще отмени всички записвания.",
-              )
-            ) {
+            if (confirm(t("cancel_confirmation"))) {
               cancelRouteMutation.mutate({ routeId });
             }
           }}
           className="mb-6 rounded bg-red-500 px-6 py-2 text-white hover:bg-red-600 disabled:opacity-50"
           disabled={cancelRouteMutation.isPending}
         >
-          {cancelRouteMutation.isPending ? "Отказване..." : "Откажи маршрута"}
+          {cancelRouteMutation.isPending ? t("cancelling") : t("cancel_route")}
         </button>
       )}
 
@@ -249,7 +243,7 @@ export default function RouteDetailsPage() {
           className="mb-6 rounded bg-green-500 px-6 py-2 text-white hover:bg-green-600 disabled:opacity-50"
           disabled={signUpMutation.isPending}
         >
-          Запиши се за пътуването
+          {t("sign_up")}
         </button>
       )}
 
@@ -257,18 +251,16 @@ export default function RouteDetailsPage() {
       {isActiveUserRide && !isRouteInPast && (
         <button
           onClick={() => {
-            if (
-              confirm(
-                "Сигурни ли сте, че искате да откажете записването си за този маршрут?",
-              )
-            ) {
+            if (confirm(t("cancel_ride_confirmation"))) {
               cancelRideMutation.mutate({ routeId });
             }
           }}
           className="mb-6 ml-2 rounded bg-red-500 px-6 py-2 text-white hover:bg-red-600 disabled:opacity-50"
           disabled={cancelRideMutation.isPending}
         >
-          {cancelRideMutation.isPending ? "Отказване..." : "Откажи записването"}
+          {cancelRideMutation.isPending
+            ? t("cancelling_ride")
+            : t("cancel_ride")}
         </button>
       )}
 

@@ -18,6 +18,7 @@ import {
   type ViewType,
   getFilterDate,
 } from "~/components/RouteFilters";
+import { useTranslations } from "next-intl";
 
 const libraries: Libraries = ["places", "geometry"];
 
@@ -48,6 +49,7 @@ const ROUTE_COLORS = [
 ];
 
 export default function AllRoutesMapPage() {
+  const t = useTranslations();
   const router = useRouter();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-route-display",
@@ -94,7 +96,7 @@ export default function AllRoutesMapPage() {
   return (
     <div className="flex h-screen w-full flex-col pt-12">
       <div className="px-4">
-        <h1 className="mb-4 text-2xl font-bold">Всички предстоящи маршрути</h1>
+        <h1 className="mb-4 text-2xl font-bold">{t("all_routes")}</h1>
         <div className="mb-4">
           <RouteFilters
             selectedFilter={selectedFilter}
@@ -116,16 +118,19 @@ export default function AllRoutesMapPage() {
                 rel="noopener noreferrer"
               >
                 <h2 className="text-sm font-semibold hover:underline">
-                  От {selectedRoute.origin} до {selectedRoute.destination} -{" "}
+                  {t("route_from_to", {
+                    origin: selectedRoute.origin,
+                    destination: selectedRoute.destination,
+                  })}
                   <span className="text-sm font-normal text-blue-600 hover:text-blue-800">
-                    Виж маршрут
+                    {t("view_route")}
                   </span>
                 </h2>
               </Link>
               {selectedRoute.dateTime && (
                 <p className="text-sm">
-                  Дата: {new Date(selectedRoute.dateTime).toLocaleDateString()}{" "}
-                  –{" "}
+                  {t("date")}:{" "}
+                  {new Date(selectedRoute.dateTime).toLocaleDateString()} –{" "}
                   {new Date(selectedRoute.dateTime).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -136,16 +141,14 @@ export default function AllRoutesMapPage() {
             <button
               onClick={() => setSelectedRouteId(null)}
               className="ml-4 text-gray-500 transition-colors hover:text-gray-700"
-              aria-label="Затвори"
+              aria-label={t("close")}
             >
               ✕
             </button>
           </div>
         </div>
       ) : (
-        <span className="px-4">
-          Натиснете върху маршрут, за да видите информация за него.
-        </span>
+        <span className="px-4">{t("click_route_info")}</span>
       )}
 
       {/* Loading spinner */}

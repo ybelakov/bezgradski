@@ -10,10 +10,12 @@ import { useRouter } from "next/navigation";
 import { useSearchStore } from "~/store/searchStore";
 import { Button } from "~/components/ui/button";
 import { BaseDialog } from "~/app/_components/BaseDialog";
+import { useTranslations } from "next-intl";
 
 const libraries: Libraries = ["places", "geometry"];
 
 export default function SearchDrivePage() {
+  const t = useTranslations();
   const mapRef = useRef<google.maps.Map | null>(null);
   const { searchOrigin, searchDestination, searchDate, resetSearchCriteria } =
     useSearchStore();
@@ -80,7 +82,7 @@ export default function SearchDrivePage() {
           onClose={() => {
             setIsModalOpen(false);
           }}
-          title="Намери Транспорт"
+          title={t("search_title")}
           modal={false}
           showCustomXIcon={false}
           dialogContentClassName="flex-col sm:max-w-md lg:flex"
@@ -98,14 +100,14 @@ export default function SearchDrivePage() {
                 disabled={!searchOrigin || !searchDestination || !searchDate}
                 className="w-full"
               >
-                Търси
+                {t("search")}
               </Button>
               <Button
                 variant="link"
                 onClick={() => router.push("/all")}
                 className="m-0 w-full cursor-pointer items-center justify-center p-0"
               >
-                Виж всички
+                {t("view_all")}
               </Button>
             </div>
           </div>

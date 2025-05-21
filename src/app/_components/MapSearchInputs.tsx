@@ -12,6 +12,7 @@ import {
 import { Calendar as CalendarIcon } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { cn } from "~/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface MapSearchInputsProps {
   isLoaded: boolean;
@@ -24,6 +25,7 @@ export function MapSearchInputs({
   mapRef,
   purpose = "offer",
 }: MapSearchInputsProps) {
+  const t = useTranslations();
   const { setOrigin: setMapOrigin, setDestination: setMapDestination } =
     useMapStore();
   const { searchDate, setSearchOrigin, setSearchDestination, setSearchDate } =
@@ -119,7 +121,7 @@ export function MapSearchInputs({
       <Autocomplete onLoad={onOriginLoad} onPlaceChanged={onOriginChanged}>
         <input
           type="text"
-          placeholder="Начална точка"
+          placeholder={t("start_point")}
           className="w-full rounded border p-2"
         />
       </Autocomplete>
@@ -129,7 +131,7 @@ export function MapSearchInputs({
       >
         <input
           type="text"
-          placeholder="Дестинация"
+          placeholder={t("destination")}
           className="w-full rounded border p-2"
         />
       </Autocomplete>
@@ -150,7 +152,7 @@ export function MapSearchInputs({
                   {dateObject ? (
                     format(dateObject, "PPP")
                   ) : (
-                    <span>Избери дата</span>
+                    <span>{t("select_date")}</span>
                   )}
                 </Button>
               </PopoverTrigger>
