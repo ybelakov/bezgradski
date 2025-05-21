@@ -5,9 +5,13 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import { BusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import SelectLanguage from "~/app/_components/SelectLanguage";
+import { Label } from "~/components/ui/label";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations();
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -35,9 +39,9 @@ export default function LoginPage() {
               <DialogTitle className="mb-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
                 <div className="absolute top-1 left-2 flex flex-row items-center gap-1 text-lg">
                   <BusIcon />
-                  Без Градски
+                  {t("app_name")}
                 </div>
-                Влез в акаунта си
+                {t("login_title")}
               </DialogTitle>
 
               <div className="mt-6">
@@ -93,10 +97,13 @@ export default function LoginPage() {
                           fill="#34A853"
                         />
                       </svg>
-                      <span>Вход с Google</span>
+                      <span>{t("login_with_google")}</span>
                     </>
                   )}
                 </button>
+                <div className="mt-4 flex justify-center">
+                  <SelectLanguage />
+                </div>
               </div>
             </div>
           </DialogContent>

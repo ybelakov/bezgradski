@@ -4,7 +4,7 @@ import React from "react";
 import { MapSearchInputs } from "./MapSearchInputs";
 import { MapControls } from "./MapControls";
 import { BaseDialog } from "./BaseDialog";
-
+import { useTranslations } from "next-intl";
 interface RouteCreationDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -20,11 +20,12 @@ export function RouteCreationDialog({
   mapRef,
   modal = false,
 }: RouteCreationDialogProps) {
+  const t = useTranslations();
   return (
     <BaseDialog
       isOpen={isOpen}
       onClose={onClose}
-      title="Маршрут"
+      title={t("route")}
       modal={modal}
       dialogContentClassName="z-[100]"
     >

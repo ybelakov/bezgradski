@@ -23,6 +23,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 interface ConfirmRouteDialogProps {
   open: boolean;
@@ -42,6 +43,7 @@ export function ConfirmRouteDialog({
   onConfirm,
   isSaving,
 }: ConfirmRouteDialogProps) {
+  const t = useTranslations();
   const [date, setDate] = React.useState<Date | undefined>(
     new Date(new Date().setDate(new Date().getDate() + 1)),
   );
@@ -80,15 +82,15 @@ export function ConfirmRouteDialog({
           onClick={onClose}
         />
         <DialogHeader>
-          <DialogTitle>Потвърди</DialogTitle>
+          <DialogTitle>{t("confirm")}</DialogTitle>
           <DialogDescription>
-            Моля, въведете датата, часа и наличните места за този маршрут.
+            {t("please_enter_date_time_and_seats")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="date" className="text-right">
-              Date
+              {t("date")}
             </Label>
             <Popover
               open={isCalendarOpen}
@@ -104,7 +106,7 @@ export function ConfirmRouteDialog({
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Дата</span>}
+                  {date ? format(date, "PPP") : <span>{t("date")}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -125,7 +127,7 @@ export function ConfirmRouteDialog({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="time" className="text-right">
-              Час
+              {t("time")}
             </Label>
             <Input
               id="time"
@@ -137,7 +139,7 @@ export function ConfirmRouteDialog({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="seats" className="text-right">
-              Места
+              {t("seats")}
             </Label>
             <Input
               id="seats"
@@ -150,7 +152,7 @@ export function ConfirmRouteDialog({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="phoneNumber" className="text-right">
-              Телефон
+              {t("phone_number")}
             </Label>
             <Input
               id="phoneNumber"
@@ -164,7 +166,7 @@ export function ConfirmRouteDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             type="submit"
@@ -173,7 +175,7 @@ export function ConfirmRouteDialog({
               !date || !time || seats === undefined || !phoneNumber || isSaving
             }
           >
-            {isSaving ? "Запазване..." : "Запази"}
+            {isSaving ? t("saving") : t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

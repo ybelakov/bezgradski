@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 // Helper function to format date and time (optional, can be expanded)
 const formatDateTime = (date: Date | string | null | undefined) => {
@@ -21,6 +22,7 @@ const formatDateTime = (date: Date | string | null | undefined) => {
 };
 
 export default function DrivesPage() {
+  const t = useTranslations();
   const { data: myRoutes, error: routesError } = api.routes.getAll.useQuery();
   const { data: passengerRides, error: passengerError } =
     api.userRide.getMyRidesAsPassenger.useQuery();
@@ -55,7 +57,7 @@ export default function DrivesPage() {
   ) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        Нямате пътувания все още
+        {t("no_rides_yet")}
       </div>
     );
   }
@@ -122,7 +124,7 @@ export default function DrivesPage() {
             {myUpcomingRoutes.length > 0 && (
               <>
                 <h2 className="mb-4 text-left text-xl font-semibold">
-                  Предстоящи пътувания
+                  {t("upcoming_rides")}
                 </h2>
                 {myUpcomingRoutes.map((route) => (
                   <div
@@ -131,39 +133,46 @@ export default function DrivesPage() {
                   >
                     <div className="flex justify-between">
                       <h2 className="mb-2 text-xl font-semibold">
-                        От {route.origin} до {route.destination}
+                        {t("route_from_to", {
+                          origin: route.origin,
+                          destination: route.destination,
+                        })}
                       </h2>
                       <button
                         onClick={() => toggleExpand(route.id)}
                         className="text-blue-500 hover:text-blue-700"
                       >
-                        {expandedRouteId === route.id ? "Скрий" : "Пътници"}
+                        {expandedRouteId === route.id
+                          ? t("hide")
+                          : t("passengers")}
                       </button>
                     </div>
                     <p className="text-muted-foreground text-sm">
-                      Дата и час:{" "}
+                      {t("date_and_time")}:{" "}
                       {formatDateTime(
                         route.dateTime as string | Date | null | undefined,
                       )}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Общо места: {route.seats ?? "N/A"}
+                      {t("total_seats")}: {route.seats ?? "N/A"}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Свободни места:{" "}
+                      {t("available_seats")}:{" "}
                       {(route.seats ?? 0) - (route._count.userRides ?? 0)}
                     </p>
                     <Link
                       href={`/${route.id}`}
                       className="mt-2 block text-sm text-blue-500 hover:underline"
                     >
-                      Детайли за пътуването
+                      {t("details_for_ride")}
                     </Link>
 
                     {/* Passengers list when expanded */}
                     {expandedRouteId === route.id && (
                       <div className="mt-4 border-t pt-4">
-                        <h3 className="mb-2 font-medium">Записани пътници:</h3>
+                        <h3 className="mb-2 font-medium">
+                          {t("passengers_title")}:
+                        </h3>
                         {passengers && passengers.length > 0 ? (
                           <ul className="space-y-2">
                             {passengers.map((passenger) => (
@@ -175,7 +184,8 @@ export default function DrivesPage() {
                                   <img
                                     src={passenger.user.image}
                                     alt={
-                                      passenger.user.name ?? "Профилна снимка"
+                                      passenger.user.name ??
+                                      t("profile_picture")
                                     }
                                     className="h-8 w-8 rounded-full"
                                   />
@@ -184,11 +194,11 @@ export default function DrivesPage() {
                                   <p className="font-medium">
                                     {passenger.user.name ??
                                       passenger.user.email ??
-                                      "Неизвестен пътник"}
+                                      t("unknown_passenger")}
                                   </p>
                                   {passenger.user.phoneNumber && (
                                     <p className="text-sm text-gray-600">
-                                      Тел:{" "}
+                                      {t("tel")}:{" "}
                                       <a
                                         href={`tel:${passenger.user.phoneNumber}`}
                                         className="hover:underline"
@@ -203,7 +213,7 @@ export default function DrivesPage() {
                           </ul>
                         ) : (
                           <p className="text-sm text-gray-500">
-                            Все още няма записани пътници.
+                            {t("no_passengers")}
                           </p>
                         )}
                       </div>
@@ -216,7 +226,7 @@ export default function DrivesPage() {
             {myPastRoutes.length > 0 && (
               <>
                 <h2 className="mt-8 mb-4 text-left text-xl font-semibold">
-                  Минали пътувания
+                  {t("past_rides")}
                 </h2>
                 {myPastRoutes.map((route) => (
                   <div
@@ -225,39 +235,46 @@ export default function DrivesPage() {
                   >
                     <div className="flex justify-between">
                       <h2 className="mb-2 text-xl font-semibold">
-                        От {route.origin} до {route.destination}
+                        {t("route_from_to", {
+                          origin: route.origin,
+                          destination: route.destination,
+                        })}
                       </h2>
                       <button
                         onClick={() => toggleExpand(route.id)}
                         className="text-blue-500 hover:text-blue-700"
                       >
-                        {expandedRouteId === route.id ? "Скрий" : "Пътници"}
+                        {expandedRouteId === route.id
+                          ? t("hide")
+                          : t("passengers")}
                       </button>
                     </div>
                     <p className="text-muted-foreground text-sm">
-                      Дата и час:{" "}
+                      {t("date_and_time")}:{" "}
                       {formatDateTime(
                         route.dateTime as string | Date | null | undefined,
                       )}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Общо места: {route.seats ?? "N/A"}
+                      {t("total_seats")}: {route.seats ?? "N/A"}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Свободни места:{" "}
+                      {t("available_seats")}:{" "}
                       {(route.seats ?? 0) - (route._count.userRides ?? 0)}
                     </p>
                     <Link
                       href={`/${route.id}`}
                       className="mt-2 block text-sm text-blue-500 hover:underline"
                     >
-                      Детайли за пътуването
+                      {t("details_for_ride")}
                     </Link>
 
                     {/* Passengers list when expanded */}
                     {expandedRouteId === route.id && (
                       <div className="mt-4 border-t pt-4">
-                        <h3 className="mb-2 font-medium">Записани пътници:</h3>
+                        <h3 className="mb-2 font-medium">
+                          {t("passengers_title")}:
+                        </h3>
                         {passengers && passengers.length > 0 ? (
                           <ul className="space-y-2">
                             {passengers.map((passenger) => (
@@ -269,7 +286,8 @@ export default function DrivesPage() {
                                   <img
                                     src={passenger.user.image}
                                     alt={
-                                      passenger.user.name ?? "Профилна снимка"
+                                      passenger.user.name ??
+                                      t("profile_picture")
                                     }
                                     className="h-8 w-8 rounded-full"
                                   />
@@ -278,11 +296,11 @@ export default function DrivesPage() {
                                   <p className="font-medium">
                                     {passenger.user.name ??
                                       passenger.user.email ??
-                                      "Неизвестен пътник"}
+                                      t("unknown_passenger")}
                                   </p>
                                   {passenger.user.phoneNumber && (
                                     <p className="text-sm text-gray-600">
-                                      Тел:{" "}
+                                      {t("tel")}:{" "}
                                       <a
                                         href={`tel:${passenger.user.phoneNumber}`}
                                         className="hover:underline"
@@ -297,7 +315,7 @@ export default function DrivesPage() {
                           </ul>
                         ) : (
                           <p className="text-sm text-gray-500">
-                            Няма записани пътници.
+                            {t("no_passengers")}
                           </p>
                         )}
                       </div>
@@ -316,7 +334,7 @@ export default function DrivesPage() {
             {upcomingPassengerRides.length > 0 && (
               <>
                 <h2 className="mb-4 text-left text-xl font-semibold">
-                  Предстоящи пътувания
+                  {t("upcoming_rides")}
                 </h2>
                 {upcomingPassengerRides.map((ride) => (
                   <div
@@ -324,10 +342,13 @@ export default function DrivesPage() {
                     className="rounded-lg border p-4 shadow-sm"
                   >
                     <h2 className="mb-2 text-xl font-semibold">
-                      От {ride.route.origin} до {ride.route.destination}
+                      {t("route_from_to", {
+                        origin: ride.route.origin,
+                        destination: ride.route.destination,
+                      })}
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Дата и час:{" "}
+                      {t("date_and_time")}:{" "}
                       {formatDateTime(
                         ride.route.dateTime as string | Date | null | undefined,
                       )}
@@ -335,12 +356,12 @@ export default function DrivesPage() {
 
                     {/* Driver information */}
                     <div className="mt-4 rounded bg-gray-50 p-3">
-                      <h3 className="font-medium">Шофьор:</h3>
+                      <h3 className="font-medium">{t("driver")}:</h3>
                       <div className="mt-2 flex items-center gap-2">
                         {ride.route.user.image && (
                           <img
                             src={ride.route.user.image}
-                            alt={ride.route.user.name ?? "Профилна снимка"}
+                            alt={ride.route.user.name ?? t("profile_picture")}
                             className="h-8 w-8 rounded-full"
                           />
                         )}
@@ -348,11 +369,11 @@ export default function DrivesPage() {
                           <p>
                             {ride.route.user.name ??
                               ride.route.user.email ??
-                              "Неизвестен шофьор"}
+                              t("unknown_driver")}
                           </p>
                           {ride.route.user.phoneNumber && (
                             <p className="text-sm text-gray-600">
-                              Тел:{" "}
+                              {t("tel")}:{" "}
                               <a
                                 href={`tel:${ride.route.user.phoneNumber}`}
                                 className="hover:underline"
@@ -369,7 +390,7 @@ export default function DrivesPage() {
                       href={`/${ride.route.id}`}
                       className="mt-3 block text-sm text-blue-500 hover:underline"
                     >
-                      Детайли за пътуването
+                      {t("details_for_ride")}
                     </Link>
                   </div>
                 ))}
@@ -379,7 +400,7 @@ export default function DrivesPage() {
             {pastPassengerRides.length > 0 && (
               <>
                 <h2 className="mt-8 mb-4 text-left text-xl font-semibold">
-                  Минали пътувания
+                  {t("past_rides")}
                 </h2>
                 {pastPassengerRides.map((ride) => (
                   <div
@@ -387,10 +408,13 @@ export default function DrivesPage() {
                     className="rounded-lg border p-4 opacity-70 shadow-sm"
                   >
                     <h2 className="mb-2 text-xl font-semibold">
-                      От {ride.route.origin} до {ride.route.destination}
+                      {t("route_from_to", {
+                        origin: ride.route.origin,
+                        destination: ride.route.destination,
+                      })}
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Дата и час:{" "}
+                      {t("date_and_time")}:{" "}
                       {formatDateTime(
                         ride.route.dateTime as string | Date | null | undefined,
                       )}
@@ -398,12 +422,12 @@ export default function DrivesPage() {
 
                     {/* Driver information */}
                     <div className="mt-4 rounded bg-gray-50 p-3">
-                      <h3 className="font-medium">Шофьор:</h3>
+                      <h3 className="font-medium">{t("driver")}:</h3>
                       <div className="mt-2 flex items-center gap-2">
                         {ride.route.user.image && (
                           <img
                             src={ride.route.user.image}
-                            alt={ride.route.user.name ?? "Профилна снимка"}
+                            alt={ride.route.user.name ?? t("profile_picture")}
                             className="h-8 w-8 rounded-full"
                           />
                         )}
@@ -411,11 +435,11 @@ export default function DrivesPage() {
                           <p>
                             {ride.route.user.name ??
                               ride.route.user.email ??
-                              "Неизвестен шофьор"}
+                              t("unknown_driver")}
                           </p>
                           {ride.route.user.phoneNumber && (
                             <p className="text-sm text-gray-600">
-                              Тел:{" "}
+                              {t("tel")}:{" "}
                               <a
                                 href={`tel:${ride.route.user.phoneNumber}`}
                                 className="hover:underline"
@@ -432,7 +456,7 @@ export default function DrivesPage() {
                       href={`/${ride.route.id}`}
                       className="mt-3 block text-sm text-blue-500 hover:underline"
                     >
-                      Детайли за пътуването
+                      {t("details_for_ride")}
                     </Link>
                   </div>
                 ))}

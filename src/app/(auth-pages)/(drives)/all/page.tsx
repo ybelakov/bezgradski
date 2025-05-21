@@ -10,9 +10,11 @@ import {
   type ViewType,
   getFilterDate,
 } from "~/components/RouteFilters";
+import { useTranslations } from "next-intl";
 
 export default function AllRoutesPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("today");
   const filterDate = useMemo(
     () => getFilterDate(selectedFilter),
@@ -73,9 +75,7 @@ export default function AllRoutesPage() {
   return (
     <div className="container mx-auto p-4 pt-12">
       <div className="mb-6">
-        <h1 className="mb-4 text-lg font-bold">
-          Всички предстоящи маршрути в София
-        </h1>
+        <h1 className="mb-4 text-lg font-bold">{t("all_routes_sofia")}</h1>
 
         <RouteFilters
           selectedFilter={selectedFilter}
@@ -84,15 +84,14 @@ export default function AllRoutesPage() {
           onViewChange={handleViewChange}
         />
       </div>
-
-      {isLoading && <p>Зареждане на маршрути...</p>}
-
+      {isLoading && <p>{t("loading_routes")}</p>}
       {isError && (
         <p className="text-red-500">
-          Грешка при зареждане на маршрути: {error?.message ?? "Unknown error"}
+          {t("error_loading_routes", {
+            error: error?.message ?? "Unknown error",
+          })}
         </p>
       )}
-
       {!isLoading && !isError && (
         <div>
           {routes.length > 0 ? (
@@ -105,17 +104,18 @@ export default function AllRoutesPage() {
                         {route.origin} - {route.destination}
                       </h3>
                       <p>
-                        Дата: {new Date(route.dateTime).toLocaleDateString()}
+                        {t("date")}:{" "}
+                        {new Date(route.dateTime).toLocaleDateString()}
                       </p>
                       <p>
-                        Час на тръгване:{" "}
+                        {t("time_of_travel")}:{" "}
                         {new Date(route.dateTime).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </p>
                       <p className="text-blue-500 hover:underline">
-                        Виж маршрут
+                        {t("view_route")}
                       </p>
                     </li>
                   </Link>
@@ -124,13 +124,13 @@ export default function AllRoutesPage() {
               <div ref={loadMoreRef} className="mt-4 h-10 w-full">
                 {isFetchingNextPage && (
                   <p className="text-center text-gray-500">
-                    Зареждане на още маршрути...
+                    {t("loading_more")}
                   </p>
                 )}
               </div>
             </>
           ) : (
-            <p>Няма намерени предстоящи маршрути.</p>
+            <p>{t("no_upcoming_routes")}</p>
           )}
         </div>
       )}

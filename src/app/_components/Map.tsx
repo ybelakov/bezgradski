@@ -11,10 +11,12 @@ import { useMapStore } from "~/store/mapStore";
 import { api } from "~/trpc/react";
 import { ConfirmRouteDialog } from "./ConfirmRouteDialog";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const libraries: Libraries = ["places", "geometry"];
 
 export function Map() {
+  const t = useTranslations();
   const mapRef = useRef<google.maps.Map | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -39,7 +41,7 @@ export function Map() {
 
   const saveRouteMutation = api.routes.create.useMutation({
     onSuccess: () => {
-      toast.success("Маршрутът е записан!");
+      toast.success(t("route_saved"));
       setIsSaving(false);
       setIsConfirmModalOpen(false);
       router.push("/drives");
@@ -102,7 +104,7 @@ export function Map() {
         }}
         disabled={!session || (!!directions && isSaving)}
       >
-        {directions ? "Публикувай" : "Създай маршрут"}
+        {directions ? t("publish_route") : t("create_route")}
       </Button>
       {/* Map */}
       <GoogleMapWithDirections

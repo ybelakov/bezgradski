@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react"; // Import tRPC hook
 import Link from "next/link"; // Import Link
+import { useTranslations } from "next-intl";
 
 interface ParsedSearchParams {
   originLat?: number;
@@ -20,6 +21,7 @@ export default function SearchResultsPage() {
   const searchParams = useSearchParams();
   const [parsedParams, setParsedParams] = useState<ParsedSearchParams>({});
   const [isQueryEnabled, setIsQueryEnabled] = useState(false);
+  const t = useTranslations();
 
   useEffect(() => {
     const params: ParsedSearchParams = {};
@@ -81,21 +83,22 @@ export default function SearchResultsPage() {
 
   return (
     <div className="container mx-auto p-4 pt-12">
-      <h1 className="mb-4 text-2xl font-bold">Търсене за</h1>
+      <h1 className="mb-4 text-2xl font-bold">{t("search_for")}</h1>
       <div className="mb-6 rounded bg-gray-100 p-4 shadow">
         {parsedParams.originAddress && (
           <p>
-            <strong>Начална точка:</strong> {parsedParams.originAddress}
+            <strong>{t("start_point")}:</strong> {parsedParams.originAddress}
           </p>
         )}
         {parsedParams.destinationAddress && (
           <p>
-            <strong>Дестинация:</strong> {parsedParams.destinationAddress}
+            <strong>{t("destination")}:</strong>{" "}
+            {parsedParams.destinationAddress}
           </p>
         )}
         {parsedParams.date && (
           <p>
-            <strong>Дата:</strong>{" "}
+            <strong>{t("date")}:</strong>{" "}
             {new Date(parsedParams.date).toLocaleDateString()}
           </p>
         )}
@@ -111,17 +114,15 @@ export default function SearchResultsPage() {
           <p>Loading search criteria...</p>
         )}
       </div>
-
       {isLoading && isQueryEnabled && <p>Searching for routes...</p>}
       {isError && isQueryEnabled && (
         <p className="text-red-500">Error fetching routes: {error?.message}</p>
       )}
-
       {!isLoading && !isError && isQueryEnabled && (
         <div>
           {routes && routes.length > 0 ? (
             <ul className="space-y-4">
-              <span className="mb-1 text-lg">Резултати</span>
+              <span className="mb-1 text-lg">{t("results")}</span>
               {routes.map((route) => (
                 <Link key={route.id} href={`/${route.id}`}>
                   <li className="cursor-pointer rounded border bg-white p-4 shadow hover:bg-gray-50">
@@ -132,13 +133,14 @@ export default function SearchResultsPage() {
                     {route.dateTime ? (
                       <p>
                         {" "}
-                        Дата: {new Date(route.dateTime).toLocaleDateString()}
+                        {t("date")}:{" "}
+                        {new Date(route.dateTime).toLocaleDateString()}
                       </p>
                     ) : null}
 
                     {route.dateTime ? (
                       <p>
-                        Час на тръгване:{" "}
+                        {t("time")}:{" "}
                         {new Date(route.dateTime).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -151,7 +153,7 @@ export default function SearchResultsPage() {
               ))}
             </ul>
           ) : (
-            <p>За съжаление, не намерихме маршрути.</p>
+            <p>{t("no_routes_found")}</p>
           )}
         </div>
       )}

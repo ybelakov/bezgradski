@@ -1,5 +1,6 @@
 import { Button } from "~/components/ui/button";
 import { LayoutGrid, List } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export type FilterType = "all" | "today" | "tomorrow";
 export type ViewType = "list" | "map";
@@ -17,6 +18,7 @@ export function RouteFilters({
   selectedView,
   onViewChange,
 }: RouteFiltersProps) {
+  const t = useTranslations();
   return (
     <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-4">
       <div className="bg-background flex w-fit rounded-md border">
@@ -24,19 +26,19 @@ export function RouteFilters({
           onClick={() => onFilterChange("all")}
           variant={selectedFilter === "all" ? "default" : "ghost"}
         >
-          Всички
+          {t("filter_all")}
         </Button>
         <Button
           onClick={() => onFilterChange("today")}
           variant={selectedFilter === "today" ? "default" : "ghost"}
         >
-          Днес
+          {t("filter_today")}
         </Button>
         <Button
           onClick={() => onFilterChange("tomorrow")}
           variant={selectedFilter === "tomorrow" ? "default" : "ghost"}
         >
-          Утре
+          {t("filter_tomorrow")}
         </Button>
       </div>
       <div className="bg-background flex w-fit rounded-md border">
@@ -46,7 +48,7 @@ export function RouteFilters({
           className="flex items-center gap-2"
         >
           <LayoutGrid className="h-4 w-4" />
-          <span>Карта</span>
+          <span>{t("filter_map")}</span>
         </Button>
         <Button
           onClick={() => onViewChange("list")}
@@ -54,7 +56,7 @@ export function RouteFilters({
           className="flex items-center gap-2"
         >
           <List className="h-4 w-4" />
-          <span>Списък</span>
+          <span>{t("filter_list")}</span>
         </Button>
       </div>
     </div>

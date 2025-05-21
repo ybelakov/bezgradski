@@ -1,53 +1,59 @@
 import "~/styles/globals.css";
 
-import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "~/components/ui/sonner";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
 import { SessionProvider } from "next-auth/react";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Без градски - намери превоз",
-  description:
-    "Намери или предложи превоз в България. Споделено пътуване без градски транспорт.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
-  openGraph: {
-    title: "Без градски - намери превоз",
-    description:
-      "Намери или предложи превоз в София. Споделено пътуване без градски транспорт.",
-    type: "website",
-    locale: "bg_BG",
-    url: "https://bezgradski.bg",
-    siteName: "Без градски",
-    images: [
-      {
-        url: "/og-image.png", // You'll need to add this image to your public folder
-        width: 1200,
-        height: 630,
-        alt: "Без градски - споделено пътуване",
-      },
-    ],
-  },
-};
+export async function generateMetadata() {
+  const t = await getTranslations();
+  const locale = await getLocale();
+  return {
+    title: t("app_title"),
+    description: t("app_description"),
+    icons: [{ rel: "icon", url: "/favicon.ico" }],
+    openGraph: {
+      title: t("app_title"),
+      description: t("app_description"),
+      type: "website",
+      locale: `${locale}_BG`,
+      url: "https://bezgradski.bg",
+      siteName: t("app_name"),
+      images: [
+        {
+          url: "/og-image.png", // You'll need to add this image to your public folder
+          width: 1200,
+          height: 630,
+          alt: t("og_image_alt"),
+        },
+      ],
+    },
+  };
+}
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
   return (
-    <html lang="en" className={`${geist.variable}`}>
+    <html lang={locale} className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>
           <HydrateClient>
             <SessionProvider>
-              <Toaster />
-              <main className="h-full w-full">{children}</main>
+              <NextIntlClientProvider locale={locale}>
+                <Toaster />
+                <main className="h-full w-full">{children}</main>
+              </NextIntlClientProvider>
             </SessionProvider>
           </HydrateClient>
         </TRPCReactProvider>
